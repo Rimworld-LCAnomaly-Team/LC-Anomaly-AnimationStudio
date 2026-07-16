@@ -500,7 +500,9 @@ Source/1.6/LCAnimationStudio/
 
 ## 13. 分阶段实现计划
 
-### Phase 0：格式验证器
+> 实现状态（2026-07-16）：Phase 0 至 Phase 4 均已落地到 `Source/1.6/LCAnimationStudio/`。其中事件 Marker 使用 `.lcas.xml` 项目旁车文件，不写入原生 `AnimationDef`；GIF 与 PNG Contact Sheet 输出到授权项目的 `1.6/Preview/`。
+
+### Phase 0：格式验证器（已实现）
 
 先实现命令行或游戏内验证按钮：
 
@@ -511,7 +513,7 @@ Source/1.6/LCAnimationStudio/
 
 这是后续所有阶段的基础。
 
-### Phase 1：游戏内预览 MVP
+### Phase 1：游戏内预览 MVP（已实现）
 
 - 从选中 Pawn 或 LC 平台取得目标。
 - 展示 RenderTree。
@@ -522,7 +524,7 @@ Source/1.6/LCAnimationStudio/
 
 此阶段可以复用或参考原版 `Dialog_DebugRenderTree` 的节点树与属性面板设计。
 
-### Phase 2：关键帧编辑与 XML 导出
+### Phase 2：关键帧编辑与 XML 导出（已实现）
 
 - `AnimationEditSession`。
 - 新建、修改、删除关键帧。
@@ -530,14 +532,14 @@ Source/1.6/LCAnimationStudio/
 - 标准 1.6 XML 导入导出。
 - 原子写入和重新解析验证。
 
-### Phase 3：场景 Gizmo 与事件 Marker
+### Phase 3：场景 Gizmo 与事件 Marker（已实现）
 
 - 画面内平移、旋转、缩放手柄。
 - 命中 tick、声音 tick、代码事件 Marker。
 - 区间循环播放。
 - 多节点姿态复制。
 
-### Phase 4：跨项目工作流
+### Phase 4：跨项目工作流（已实现）
 
 - 项目根目录设置。
 - Def 到文件映射。

@@ -57,6 +57,11 @@ namespace LCAnimationStudio.Serialization
                     ValidateTrack(entry, filePath, defName, duration, knownTagDefs, issues);
             }
 
+            float posRotScale;
+            XElement posRotScaleElement = def.Element("posRotScale");
+            if (posRotScaleElement != null && !TryFiniteFloat(posRotScaleElement.Value, out posRotScale))
+                AddError(issues, filePath, defName, null, null, "posRotScale must be a finite number.");
+
             string loopMode = Value(def.Element("loopMode"));
             if (loopMode == "End" || loopMode == "Clamp")
                 issues.Add(new ValidationIssue(ValidationSeverity.Warning, filePath, defName, null, null, "loopMode=" + loopMode + " does not continuously loop; verify playback intent."));
@@ -77,6 +82,12 @@ namespace LCAnimationStudio.Serialization
             }
             if (value.Element("workerClass") != null)
                 AddError(issues, filePath, defName, tag, null, "Use workerType instead of the RimWorld 1.5 workerClass field.");
+            if (string.IsNullOrWhiteSpace(Value(value.Element("workerType"))))
+                AddError(issues, filePath, defName, tag, null, "Keyframe tracks require a workerType.");
+            float[] pivot;
+            XElement pivotElement = value.Element("pivot");
+            if (pivotElement != null && !TryVector(pivotElement.Value, 2, out pivot))
+                AddError(issues, filePath, defName, tag, null, "pivot must contain two finite numbers.");
 
             XElement keyframes = value.Element("keyframes");
             XElement[] frames = keyframes?.Elements("li").ToArray() ?? new XElement[0];
@@ -124,11 +135,16 @@ namespace LCAnimationStudio.Serialization
 
         private static bool TryVector3(string text, out float[] result)
         {
+            return TryVector(text, 3, out result);
+        }
+
+        private static bool TryVector(string text, int count, out float[] result)
+        {
             result = null;
             if (text == null) return false;
             string[] parts = text.Trim().Trim('(', ')').Split(',');
-            if (parts.Length != 3) return false;
-            var values = new float[3];
+            if (parts.Length != count) return false;
+            var values = new float[count];
             for (int i = 0; i < parts.Length; i++)
                 if (!TryFiniteFloat(parts[i], out values[i])) return false;
             result = values;

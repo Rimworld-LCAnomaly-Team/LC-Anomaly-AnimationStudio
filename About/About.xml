@@ -6,5 +6,5 @@
   <supportedVersions>
     <li>1.6</li>
   </supportedVersions>
-  <description>RimWorld 1.6 in-game animation authoring and validation tools.</description>
+  <description>RimWorld 1.6 in-game animation editing, validation, project workflow, and preview export tools.</description>
 </ModMetaData>

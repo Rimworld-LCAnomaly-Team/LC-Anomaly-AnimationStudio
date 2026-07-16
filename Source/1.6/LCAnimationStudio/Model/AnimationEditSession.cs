@@ -17,7 +17,9 @@ namespace LCAnimationStudio.Model
         public LoopMode LoopMode;
         public float PosRotScale;
         public List<EditableNodeTrack> Tracks = new List<EditableNodeTrack>();
+        public List<AnimationMarker> Markers = new List<AnimationMarker>();
         public bool IsDirty;
+        public bool MetadataDirty;
 
         public bool CanUndo => history.CanUndo;
         public bool CanRedo => history.CanRedo;
@@ -102,6 +104,53 @@ namespace LCAnimationStudio.Model
             return true;
         }
 
+        public Dictionary<string, EditableKeyframe> CapturePose(IEnumerable<string> tagDefNames, int tick)
+        {
+            var result = new Dictionary<string, EditableKeyframe>(StringComparer.Ordinal);
+            foreach (string tag in tagDefNames.Distinct(StringComparer.Ordinal))
+            {
+                EditableKeyframe frame = FindTrack(tag)?.Keyframes.FirstOrDefault(item => item.Tick == tick);
+                if (frame != null) result[tag] = frame.Clone();
+            }
+            return result;
+        }
+
+        public bool PastePose(IDictionary<string, EditableKeyframe> pose, int tick)
+        {
+            if (pose == null || pose.Count == 0) return false;
+            if (tick < 0 || tick > DurationTicks) throw new ArgumentOutOfRangeException(nameof(tick));
+            RecordChange();
+            foreach (KeyValuePair<string, EditableKeyframe> pair in pose)
+            {
+                EditableNodeTrack track = FindTrack(pair.Key);
+                if (track == null) continue;
+                EditableKeyframe frame = pair.Value.Clone();
+                frame.Tick = tick;
+                int index = track.Keyframes.FindIndex(existing => existing.Tick == tick);
+                if (index >= 0) track.Keyframes[index] = frame;
+                else track.Keyframes.Add(frame);
+                track.Keyframes.Sort((left, right) => left.Tick.CompareTo(right.Tick));
+            }
+            IsDirty = true;
+            return true;
+        }
+
+        public void AddMarker(AnimationMarker marker)
+        {
+            if (marker == null) throw new ArgumentNullException(nameof(marker));
+            if (marker.Tick < 0 || marker.Tick > DurationTicks) throw new ArgumentOutOfRangeException(nameof(marker.Tick));
+            Markers.Add(marker.Clone());
+            Markers.Sort((left, right) => left.Tick.CompareTo(right.Tick));
+            MetadataDirty = true;
+        }
+
+        public bool RemoveMarker(AnimationMarker marker)
+        {
+            bool removed = Markers.Remove(marker);
+            if (removed) MetadataDirty = true;
+            return removed;
+        }
+
         public bool Undo()
         {
             Snapshot state;
@@ -118,7 +167,12 @@ namespace LCAnimationStudio.Model
             return true;
         }
 
-        public void MarkClean() => IsDirty = false;
+        public void MarkClean()
+        {
+            IsDirty = false;
+            history.Clear();
+        }
+        public void MarkMetadataClean() => MetadataDirty = false;
         private void RecordChange() => history.Record(Capture());
 
         private Snapshot Capture()

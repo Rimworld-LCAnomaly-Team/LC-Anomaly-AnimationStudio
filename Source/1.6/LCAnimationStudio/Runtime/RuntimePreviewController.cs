@@ -17,6 +17,9 @@ namespace LCAnimationStudio.Runtime
         public int RequestedTick { get; private set; }
         public bool IsPlaying { get; private set; }
         public bool Loop { get; set; } = true;
+        public bool LoopRangeEnabled { get; set; }
+        public int LoopStartTick { get; set; }
+        public int LoopEndTick { get; set; }
 
         public void BindTarget(Pawn pawn)
         {
@@ -90,13 +93,16 @@ namespace LCAnimationStudio.Runtime
             fractionalTicks -= wholeTicks;
 
             int next = RequestedTick + wholeTicks;
-            if (next > Animation.durationTicks)
+            int rangeStart = LoopRangeEnabled ? Mathf.Clamp(LoopStartTick, 0, Animation.durationTicks) : 0;
+            int rangeEnd = LoopRangeEnabled ? Mathf.Clamp(LoopEndTick, rangeStart, Animation.durationTicks) : Animation.durationTicks;
+            if (next > rangeEnd)
             {
-                if (Loop && Animation.durationTicks > 0)
-                    next %= Animation.durationTicks;
+                int length = rangeEnd - rangeStart + 1;
+                if (Loop && length > 0)
+                    next = rangeStart + (next - rangeStart) % length;
                 else
                 {
-                    next = Animation.durationTicks;
+                    next = rangeEnd;
                     IsPlaying = false;
                 }
             }

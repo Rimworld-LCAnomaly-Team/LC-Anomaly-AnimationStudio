@@ -102,6 +102,8 @@ function Test-AnimationFile {
             if (-not $tag) { Write-Issue ERROR $File.FullName $defName $null $null "keyframeParts entry requires a tag Def name in 'key'." }
             elseif ($KnownTags.Count -gt 0 -and -not $KnownTags.Contains($tag)) { Write-Issue ERROR $File.FullName $defName $tag $null 'PawnRenderNodeTagDef is not defined under 1.6/Defs.' }
             $frames = @($entry.SelectNodes('./value/keyframes/li'))
+            $workerType = $entry.SelectSingleNode('./value/workerType')
+            if (-not $workerType -or -not $workerType.InnerText.Trim()) { Write-Issue ERROR $File.FullName $defName $tag $null 'Keyframe tracks require a workerType.' }
             if ($frames.Count -eq 0) { Write-Issue ERROR $File.FullName $defName $tag $null 'Track must contain at least one keyframe.'; continue }
             $previousTick = -1
             foreach ($frame in $frames) {
@@ -147,7 +149,7 @@ foreach ($path in $AnimationPath) {
         Write-Issue ERROR $resolved $null $null $null 'RimWorld 1.5 paths are read-only and cannot be validation targets.'
         continue
     }
-    if (Test-Path -LiteralPath $resolved -PathType Container) { $files += Get-ChildItem -LiteralPath $resolved -Recurse -File -Filter '*.xml' }
+    if (Test-Path -LiteralPath $resolved -PathType Container) { $files += Get-ChildItem -LiteralPath $resolved -Recurse -File -Filter '*.xml' | Where-Object { $_.Name -notlike '*.lcas.xml' } }
     elseif (Test-Path -LiteralPath $resolved -PathType Leaf) { $files += Get-Item -LiteralPath $resolved }
     else { Write-Issue WARNING $resolved $null $null $null 'Validation target does not exist.' }
 }

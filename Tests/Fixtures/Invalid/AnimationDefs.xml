@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <AnimationDef>
+    <defName>LCAS_Broken</defName>
+    <durationTicks>10</durationTicks>
+    <animationParts>
+      <li>
+        <key>LCAS_TestNode</key>
+        <value>
+          <workerClass>AnimationWorker_Keyframes</workerClass>
+          <keyframes>
+            <li><tick>11</tick><scale>(1,0,1)</scale></li>
+          </keyframes>
+        </value>
+      </li>
+    </animationParts>
+  </AnimationDef>
+</Defs>

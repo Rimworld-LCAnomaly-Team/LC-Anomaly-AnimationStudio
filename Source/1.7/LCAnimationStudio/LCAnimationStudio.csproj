@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\RimWorld17.props" />
+  <PropertyGroup>
+    <AssemblyName>LCAnimationStudio</AssemblyName>
+    <RootNamespace>LCAnimationStudio</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Bootstrap\LCAnimationStudioMod.cs" />
+    <Compile Include="Bootstrap\AnimationStudioSettings.cs" />
+    <Compile Include="Model\AnimationEditSession.cs" />
+    <Compile Include="Model\AnimationMarker.cs" />
+    <Compile Include="Model\EditableKeyframe.cs" />
+    <Compile Include="Model\EditableNodeTrack.cs" />
+    <Compile Include="Model\UndoRedoStack.cs" />
+    <Compile Include="Runtime\PreviewAnimationFactory.cs" />
+    <Compile Include="Runtime\AnimationFileWatcher.cs" />
+    <Compile Include="Runtime\AnimatedGifEncoder.cs" />
+    <Compile Include="Runtime\ContactSheetExporter.cs" />
+    <Compile Include="Runtime\PreviewTargetResolver.cs" />
+    <Compile Include="Runtime\RuntimePreviewController.cs" />
+    <Compile Include="Serialization\AnimationSchemaValidator.cs" />
+    <Compile Include="Serialization\AnimationXmlSerializer.cs" />
+    <Compile Include="Serialization\AnimationProjectMetadataSerializer.cs" />
+    <Compile Include="Serialization\AnimationProjectValidator.cs" />
+    <Compile Include="Serialization\ProjectPathResolver.cs" />
+    <Compile Include="Serialization\ValidationIssue.cs" />
+    <Compile Include="UI\Window_LCAnimationStudio.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+
+  </ItemGroup>
+</Project>

@@ -6,13 +6,13 @@
     <loopMode>Loop</loopMode>
     <keyframeParts>
       <li>
-        <key>LCAS_TestNode</key>
+        <key>Root</key>
         <value>
           <workerType>AnimationWorker_Keyframes</workerType>
           <pivot>(0.5,0.5)</pivot>
           <rotationMode>Relative</rotationMode>
           <keyframes>
-            <li><tick>0</tick><offset>(0,0,0)</offset><angle>0</angle><scale>(1,1,1)</scale></li>
+            <li><tick>0</tick><offset>(0,0,0)</offset><angle>0</angle><scale>(0,0,0)</scale></li>
             <li><tick>60</tick><offset>(0,0,0.1)</offset><angle>-3</angle><scale>(1,1,1)</scale></li>
           </keyframes>
         </value>

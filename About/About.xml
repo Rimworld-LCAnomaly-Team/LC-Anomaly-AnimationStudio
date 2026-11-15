@@ -4,8 +4,7 @@
   <author>LC Anomaly Team</author>
   <packageId>lcanomaly.animationstudio</packageId>
   <supportedVersions>
-    <li>1.6</li>
     <li>1.7</li>
-	</supportedVersions>
-  <description>RimWorld 1.6 / 1.7 in-game animation editing, validation, project workflow, and preview export tools.</description>
+  </supportedVersions>
+  <description>RimWorld 1.7 in-game animation editing, validation, project workflow, and preview export tools.</description>
 </ModMetaData>

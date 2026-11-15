@@ -24,7 +24,7 @@ namespace LCAnimationStudio.Bootstrap
         {
             var listing = new Listing_Standard();
             listing.Begin(inRect);
-            listing.Label("Authorized project root (exports are restricted to its 1.6/Defs/AnimationDefs folder):");
+            listing.Label("Authorized project root (exports are restricted to its 1.7/Defs/AnimationDefs folder):");
             Settings.ProjectRoot = listing.TextEntry(Settings.ProjectRoot ?? RootDir);
             listing.Gap();
             listing.CheckboxLabeled("Watch mapped XML files for external changes", ref Settings.WatchExternalChanges);

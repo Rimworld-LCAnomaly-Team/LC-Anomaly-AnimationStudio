@@ -233,10 +233,12 @@ namespace LCAnimationStudio.Serialization
         private static void RejectReadOnlyPath(string path)
         {
             string normalized = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-            string marker = Path.DirectorySeparatorChar + "1.5" + Path.DirectorySeparatorChar;
-            string sourceMarker = Path.DirectorySeparatorChar + "Source" + Path.DirectorySeparatorChar + "1.5" + Path.DirectorySeparatorChar;
-            if (normalized.IndexOf(marker, StringComparison.OrdinalIgnoreCase) >= 0 || normalized.IndexOf(sourceMarker, StringComparison.OrdinalIgnoreCase) >= 0)
-                throw new UnauthorizedAccessException("RimWorld 1.5 paths are read-only.");
+            foreach (string retiredVersion in new[] { "1.5", "1.6" })
+            {
+                string marker = Path.DirectorySeparatorChar + retiredVersion + Path.DirectorySeparatorChar;
+                if (normalized.IndexOf(marker, StringComparison.OrdinalIgnoreCase) >= 0)
+                    throw new UnauthorizedAccessException("Animation exports target RimWorld 1.7; retired version paths are not supported.");
+            }
             if (!string.Equals(Path.GetExtension(path), ".xml", StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Animation exports must use an .xml file.");
         }

@@ -14,7 +14,7 @@ namespace LCAnimationStudio.Serialization
         public IReadOnlyList<ValidationIssue> ValidateProject(string projectRoot)
         {
             var issues = new List<ValidationIssue>();
-            string directory = Path.Combine(Path.GetFullPath(projectRoot), "1.6", "Defs", "AnimationDefs");
+            string directory = Path.Combine(Path.GetFullPath(projectRoot), "1.7", "Defs", "AnimationDefs");
             if (!Directory.Exists(directory))
             {
                 issues.Add(new ValidationIssue(ValidationSeverity.Warning, directory, null, null, null, "AnimationDefs directory does not exist."));
@@ -39,7 +39,7 @@ namespace LCAnimationStudio.Serialization
             var issues = new List<ValidationIssue>();
             foreach (string directory in Directory.GetDirectories(modsDirectory).OrderBy(item => item, StringComparer.OrdinalIgnoreCase))
             {
-                string animationDirectory = Path.Combine(directory, "1.6", "Defs", "AnimationDefs");
+                string animationDirectory = Path.Combine(directory, "1.7", "Defs", "AnimationDefs");
                 if (Directory.Exists(animationDirectory)) issues.AddRange(ValidateProject(directory));
             }
             return issues;

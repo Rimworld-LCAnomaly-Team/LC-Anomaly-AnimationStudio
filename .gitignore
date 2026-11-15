@@ -356,7 +356,6 @@ ASALocalRun/
 *.binlog
 
 # Machine-local RimWorld assembly paths
-Source/1.6/LocalDllPaths.props
 
 # NVidia Nsight GPU debugger configuration file
 *.nvuser

@@ -118,8 +118,6 @@ namespace LCAnimationStudio.Serialization
                     XElement element = frame.Element(field);
                     if (element != null && !TryVector3(element.Value, out vector))
                         AddError(issues, filePath, defName, tag, tick, field + " must contain three finite numbers.");
-                    else if (field == "scale" && element != null && vector.Any(component => component == 0f))
-                        AddError(issues, filePath, defName, tag, tick, "scale axes must be non-zero.");
                 }
 
                 float angle;

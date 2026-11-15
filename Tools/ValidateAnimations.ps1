@@ -2,6 +2,7 @@
 param(
     [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot),
     [string[]]$AnimationPath,
+    [string]$RimWorldRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path,
     [switch]$WarningsAsErrors
 )
 
@@ -50,9 +51,17 @@ function Test-Vector3 {
 function Get-TagDefNames {
     param([string]$Root)
     $names = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
-    $defsRoot = Join-Path $Root '1.6\Defs'
-    if (-not (Test-Path -LiteralPath $defsRoot)) { return $names }
-    foreach ($file in Get-ChildItem -LiteralPath $defsRoot -Recurse -File -Filter '*.xml') {
+    $defsRoot = Join-Path $Root '1.7\Defs'
+    $files = @()
+    if (Test-Path -LiteralPath $defsRoot) {
+        $files += Get-ChildItem -LiteralPath $defsRoot -Recurse -File -Filter '*.xml'
+    }
+    $baseTags = Join-Path $RimWorldRoot 'Data/Core/Defs/PawnRenderTreeDefs/PawnRenderNodeTagDefs.xml'
+    if (-not (Test-Path -LiteralPath $baseTags)) {
+        throw 'Base-game render node tags were not found; pass -RimWorldRoot for the installed 1.7 game.'
+    }
+    $files += Get-Item -LiteralPath $baseTags
+    foreach ($file in $files) {
         try {
             [xml]$xml = Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8
             foreach ($node in $xml.SelectNodes('//PawnRenderNodeTagDef/defName')) {
@@ -60,7 +69,7 @@ function Get-TagDefNames {
             }
         } catch { }
     }
-    return $names
+    return ,$names
 }
 
 function Test-AnimationFile {
@@ -100,7 +109,7 @@ function Test-AnimationFile {
             $tagNode = $entry.SelectSingleNode('./key')
             $tag = if ($tagNode) { $tagNode.InnerText.Trim() } else { '' }
             if (-not $tag) { Write-Issue ERROR $File.FullName $defName $null $null "keyframeParts entry requires a tag Def name in 'key'." }
-            elseif ($KnownTags.Count -gt 0 -and -not $KnownTags.Contains($tag)) { Write-Issue ERROR $File.FullName $defName $tag $null 'PawnRenderNodeTagDef is not defined under 1.6/Defs.' }
+            elseif (-not $KnownTags.Contains($tag)) { Write-Issue ERROR $File.FullName $defName $tag $null 'PawnRenderNodeTagDef is not defined in the base game or project 1.7/Defs.' }
             $frames = @($entry.SelectNodes('./value/keyframes/li'))
             $workerType = $entry.SelectSingleNode('./value/workerType')
             if (-not $workerType -or -not $workerType.InnerText.Trim()) { Write-Issue ERROR $File.FullName $defName $tag $null 'Keyframe tracks require a workerType.' }
@@ -121,7 +130,6 @@ function Test-AnimationFile {
                     if ($node) {
                         $values = $null
                         if (-not (Test-Vector3 $node.InnerText ([ref]$values))) { Write-Issue ERROR $File.FullName $defName $tag $tick "$field must contain three finite numbers." }
-                        elseif ($field -eq 'scale' -and $values -contains 0.0) { Write-Issue ERROR $File.FullName $defName $tag $tick 'scale axes must be non-zero.' }
                     }
                 }
                 $angleNode = $frame.SelectSingleNode('./angle')
@@ -139,14 +147,17 @@ function Test-AnimationFile {
 }
 
 $root = [IO.Path]::GetFullPath($ProjectRoot)
-$forbidden15 = [IO.Path]::GetFullPath((Join-Path $root '1.5'))
-$forbiddenSource15 = [IO.Path]::GetFullPath((Join-Path $root 'Source\1.5'))
-if (-not $AnimationPath) { $AnimationPath = @(Join-Path $root '1.6\Defs\AnimationDefs') }
+$retiredRoots = @('1.5', '1.6', 'Source\1.5', 'Source\1.6') | ForEach-Object {
+    [IO.Path]::GetFullPath((Join-Path $root $_)).TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+}
+if (-not $AnimationPath) { $AnimationPath = @(Join-Path $root '1.7\Defs\AnimationDefs') }
 $files = @()
 foreach ($path in $AnimationPath) {
     $resolved = [IO.Path]::GetFullPath($path)
-    if ($resolved.StartsWith($forbidden15, [StringComparison]::OrdinalIgnoreCase) -or $resolved.StartsWith($forbiddenSource15, [StringComparison]::OrdinalIgnoreCase)) {
-        Write-Issue ERROR $resolved $null $null $null 'RimWorld 1.5 paths are read-only and cannot be validation targets.'
+    if (@($retiredRoots | Where-Object {
+        ($resolved + [IO.Path]::DirectorySeparatorChar).StartsWith($_, [StringComparison]::OrdinalIgnoreCase)
+    }).Count -gt 0) {
+        Write-Issue ERROR $resolved $null $null $null 'Retired RimWorld version paths are not supported; target 1.7.'
         continue
     }
     if (Test-Path -LiteralPath $resolved -PathType Container) { $files += Get-ChildItem -LiteralPath $resolved -Recurse -File -Filter '*.xml' | Where-Object { $_.Name -notlike '*.lcas.xml' } }

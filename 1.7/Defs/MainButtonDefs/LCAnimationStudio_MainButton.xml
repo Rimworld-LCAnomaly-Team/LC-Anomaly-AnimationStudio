@@ -3,7 +3,7 @@
   <MainButtonDef>
     <defName>LCAnimationStudio</defName>
     <label>animation studio</label>
-    <description>Edit, validate, preview, and export RimWorld 1.6 PawnRenderTree animations.</description>
+    <description>Edit, validate, preview, and export RimWorld 1.7 PawnRenderTree animations.</description>
     <tabWindowClass>LCAnimationStudio.UI.Window_LCAnimationStudio</tabWindowClass>
     <order>999</order>
     <validWithoutMap>false</validWithoutMap>

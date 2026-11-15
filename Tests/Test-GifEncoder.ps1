@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
-$studio = [Reflection.Assembly]::LoadFrom((Resolve-Path (Join-Path $root '1.6\Assemblies\LCAnimationStudio.dll')))
+$studio = [Reflection.Assembly]::LoadFrom((Resolve-Path (Join-Path $root '1.7\Assemblies\LCAnimationStudio.dll')))
 $encoder = $studio.GetType('LCAnimationStudio.Runtime.AnimatedGifEncoder', $true)
 $compress = $encoder.GetMethod('Compress', [Reflection.BindingFlags]'NonPublic,Static')
 $width = 256

@@ -2,7 +2,7 @@
 
 ## 1. 文档目的
 
-本文面向后续负责 LC Anomaly 系列工具开发的 AI 或开发者，描述一套基于 RimWorld 1.6 原生 `PawnRenderTree` / `AnimationDef` 的游戏内实时动画编辑器。
+本文面向后续负责 LC Anomaly 系列工具开发的 AI 或开发者，描述一套基于 RimWorld 1.7 原生 `PawnRenderTree` / `AnimationDef` 的游戏内实时动画编辑器。
 
 目标工具暂定名为 **LC Animation Studio**。它应当让内容作者在 RimWorld 实际渲染环境中选择 Pawn、浏览渲染节点、拖动时间轴、修改关键帧并直接导出可被子 Mod 加载的标准 XML。
 
@@ -15,15 +15,15 @@ LC 系列实体使用拆分 PNG、`PawnRenderTreeDef`、`PawnRenderNodeTagDef` �
 - 关键帧需要反复修改 XML、启动游戏和观察结果。
 - 无法在 RimWorld 的真实 DrawSize、Pivot、父子矩阵和 Shader 环境中拖动预览。
 - 难以观察指定 tick，命中 tick 与画面爆发点容易错位。
-- 节点标签、持续时间、关键帧顺序和 1.5/1.6 字段差异容易写错。
+- 节点标签、持续时间、关键帧顺序和 1.5/1.7 字段差异容易写错。
 - 离线预览器只能近似模拟 `PawnRenderTree`，不能作为最终事实来源。
 - 每个子 Mod 都重复解决同一类预览、验证和导出问题。
 
 LC Animation Studio 应把 RimWorld 本身变成动画编辑器，导出的 XML 仍然保持原生、可审查、可版本控制。
 
-## 3. 已确认的 RimWorld 1.6 事实
+## 3. 已确认的 RimWorld 1.7 事实
 
-以下类型和字段已经依据 RimWorld 1.6 程序集核对：
+以下类型和字段已经依据 RimWorld 1.7 程序集核对：
 
 - `Verse.AnimationDef`
   - `durationTicks`
@@ -52,7 +52,7 @@ LC Animation Studio 应把 RimWorld 本身变成动画编辑器，导出的 XML 
 - `PawnRenderTree.TryGetNodeByTag` 可按 `PawnRenderNodeTagDef` 查找节点。
 - 原版 `Dialog_DebugRenderTree` 已能实时调整节点的 Offset、Pivot、Angle、Scale、Layer 和 Enabled 状态，但没有完整时间轴、关键帧管理和 XML 导出。
 
-### 3.1 RimWorld 1.6 正确 XML 结构
+### 3.1 RimWorld 1.7 正确 XML 结构
 
 ```xml
 <AnimationDef>
@@ -98,7 +98,7 @@ LC Animation Studio 应把 RimWorld 本身变成动画编辑器，导出的 XML 
 <workerClass>     <!-- 错误：1.5 旧格式 -->
 ```
 
-对应的 1.6 字段必须是：
+对应的 1.7 字段必须是：
 
 ```xml
 <keyframeParts>
@@ -128,7 +128,7 @@ Studio 应作为开发工具存在，不应成为 LC 子 Mod 的运行时硬依�
 
 ### 4.5 标准格式优先
 
-导出物必须是 RimWorld 1.6 原生 `AnimationDef`。不要发明只有 LC Core 才能读取的动画格式。
+导出物必须是 RimWorld 1.7 原生 `AnimationDef`。不要发明只有 LC Core 才能读取的动画格式。
 
 ## 5. 推荐部署方式
 
@@ -137,17 +137,17 @@ Studio 应作为开发工具存在，不应成为 LC 子 Mod 的运行时硬依�
 ```text
 LC-Anomaly-AnimationStudio/
 ├─ About/
-├─ 1.6/
+├─ 1.7/
 │  ├─ Assemblies/
 │  └─ Defs/
-└─ Source/1.6/LCAnimationStudio/
+└─ Source/1.7/LCAnimationStudio/
 ```
 
 推荐依赖：
 
-- RimWorld 1.6
+- RimWorld 1.7
 - Harmony（仅在确有必要打开原版入口或冻结动画 tick 时使用）
-- LC Anomaly Core 1.6（用于识别 LC 收容平台和 HeldPawn；核心编辑能力不得依赖 LC 专有实体）
+- LC Anomaly Core 1.7（用于识别 LC 收容平台和 HeldPawn；核心编辑能力不得依赖 LC 专有实体）
 
 不建议直接把编辑器程序集塞进每个异常实体子 Mod。独立工具可以服务 Laetitia、Ordeals、Story 及后续实体项目。
 
@@ -297,7 +297,7 @@ public sealed class EditableKeyframe
 
 职责：
 
-- 从标准 1.6 XML 读取 `AnimationDef`。
+- 从标准 1.7 XML 读取 `AnimationDef`。
 - 把 tagDef 名称解析为编辑轨道。
 - 保留未被编辑器理解但合法的字段，或在导入时明确警告。
 - 以稳定顺序输出 XML，减少 Git 噪音。
@@ -342,8 +342,8 @@ public sealed class EditableKeyframe
 - 用户首次导出时选择具体 XML。
 - 保存 `defName -> XML absolute path` 映射。
 - 每次写入前确认路径仍位于已授权项目根目录内。
-- 默认只允许写入 `1.6/Defs/AnimationDefs/`。
-- 禁止写入 `1.5/` 和 `Source/1.5/`。
+- 默认只允许写入 `1.7/Defs/AnimationDefs/`。
+- 不支持向 1.5、1.6 目录导出；旧版内容与源码项目已从当前发布树移除。
 
 ## 8. 编辑交互细节
 
@@ -469,7 +469,7 @@ Studio 主体仍应能编辑普通 RimWorld Pawn。
 ## 12. 文件与类布局建议
 
 ```text
-Source/1.6/LCAnimationStudio/
+Source/1.7/LCAnimationStudio/
 ├─ Bootstrap/
 │  └─ LCAnimationStudioMod.cs
 ├─ UI/
@@ -500,13 +500,13 @@ Source/1.6/LCAnimationStudio/
 
 ## 13. 分阶段实现计划
 
-> 实现状态（2026-07-16）：Phase 0 至 Phase 4 均已落地到 `Source/1.6/LCAnimationStudio/`。其中事件 Marker 使用 `.lcas.xml` 项目旁车文件，不写入原生 `AnimationDef`；GIF 与 PNG Contact Sheet 输出到授权项目的 `1.6/Preview/`。
+> 当前实现状态（2026-11-15）：Phase 0 至 Phase 4 的代码已统一迁移到 `Source/1.7/LCAnimationStudio/`。其中事件 Marker 使用 `.lcas.xml` 项目旁车文件，不写入原生 `AnimationDef`；GIF 与 PNG Contact Sheet 输出到授权项目的 `1.7/Preview/`。
 
 ### Phase 0：格式验证器（已实现）
 
 先实现命令行或游戏内验证按钮：
 
-- 扫描 `1.6/Defs/AnimationDefs/*.xml`。
+- 扫描 `1.7/Defs/AnimationDefs/*.xml`。
 - 阻止 1.5 字段。
 - 校验节点标签和关键帧。
 - 输出精确到 Def、节点和 tick 的错误。
@@ -529,7 +529,7 @@ Source/1.6/LCAnimationStudio/
 - `AnimationEditSession`。
 - 新建、修改、删除关键帧。
 - Undo/Redo。
-- 标准 1.6 XML 导入导出。
+- 标准 1.7 XML 导入导出。
 - 原子写入和重新解析验证。
 
 ### Phase 3：场景 Gizmo 与事件 Marker（已实现）
@@ -556,10 +556,10 @@ MVP 完成必须同时满足：
 - 能暂停到指定 tick。
 - 能选择 `Laetitia_Head`，修改 Angle，并立即看到真实游戏渲染变化。
 - 能在当前 tick 新增关键帧。
-- 能导出使用 `keyframeParts` / `workerType` 的 RimWorld 1.6 XML。
+- 能导出使用 `keyframeParts` / `workerType` 的 RimWorld 1.7 XML。
 - 导出的 XML 重启游戏后能够正常加载。
 - 导出前后所有轨道数、关键帧数和关键帧值一致。
-- 不修改任何 `1.5/` 或 `Source/1.5/` 文件。
+- 所有导出与预览文件写入授权项目的 1.7 目录。
 
 ## 15. 自动化验证建议
 
@@ -622,7 +622,7 @@ Tools/ValidateAnimations.ps1
 5. 实现暂停和 Scrub：调整当前 Preview Pawn 的 `animationStartTick`。
 6. 实现 `AnimationEditSession` 和临时 Preview AnimationDef。
 7. 实现关键帧 CRUD 和 Undo/Redo。
-8. 实现标准 1.6 XML 导入导出。
+8. 实现标准 1.7 XML 导入导出。
 9. 使用 Laetitia 的 `Idle`、`Work`、`GiveGift` 三套动画作为首个端到端验收样例。
 10. 再用 LaetitiaMonster 的攻击命中 tick 验证事件 Marker 和单 tick 停顿功能。
 
@@ -630,15 +630,15 @@ Tools/ValidateAnimations.ps1
 
 本项目可作为 Studio 的首个测试素材：
 
-- `1.6/Defs/AnimationDefs/Laetitia.xml`
+- `1.7/Defs/AnimationDefs/Laetitia.xml`
   - `Laetitia_Idle`
   - `Laetitia_Work`
   - `Laetitia_GiveGift`
-- `1.6/Defs/AnimationDefs/LaetitiaMonster.xml`
+- `1.7/Defs/AnimationDefs/LaetitiaMonster.xml`
   - Walk、Idle、AttackR、AttackL、Spawn、Dead
-- `1.6/Defs/PawnRenderTreeDefs/LaetitiaRenderTreeDefs.xml`
-- `1.6/Defs/PawnRenderTreeDefs/LaetitiaMonsterRenderTreeDefs.xml`
-- `1.6/Defs/PawnRenderTreeDefs/PawnRenderNodeTagDefs.xml`
+- `1.7/Defs/PawnRenderTreeDefs/LaetitiaRenderTreeDefs.xml`
+- `1.7/Defs/PawnRenderTreeDefs/LaetitiaMonsterRenderTreeDefs.xml`
+- `1.7/Defs/PawnRenderTreeDefs/PawnRenderNodeTagDefs.xml`
 
-这些动画应全部保持 RimWorld 1.6 原生 `keyframeParts` / `workerType` 格式，并纳入 Studio Validator 的回归样例。
+这些动画应全部保持 RimWorld 1.7 原生 `keyframeParts` / `workerType` 格式，并纳入 Studio Validator 的回归样例。
 

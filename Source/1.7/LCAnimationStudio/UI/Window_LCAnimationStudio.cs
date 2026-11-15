@@ -484,7 +484,7 @@ namespace LCAnimationStudio.UI
         private string DefaultExportPath()
         {
             string defName = session?.DefName ?? "Animation";
-            return pathResolver?.Resolve(defName) ?? Path.Combine(LCAnimationStudioMod.RootDir, "1.6", "Defs", "AnimationDefs", defName + ".xml");
+            return pathResolver?.Resolve(defName) ?? Path.Combine(LCAnimationStudioMod.RootDir, "1.7", "Defs", "AnimationDefs", defName + ".xml");
         }
 
         private void CopySelectedPose(string currentTag)
@@ -644,7 +644,7 @@ namespace LCAnimationStudio.UI
                 IEnumerable<int> ticks = session.Markers.Count > 0
                     ? session.Markers.Select(marker => marker.Tick)
                     : Enumerable.Range(0, 8).Select(index => Mathf.RoundToInt(session.DurationTicks * index / 7f));
-                string path = Path.Combine(pathResolver.ProjectRoot, "1.6", "Preview", session.DefName + "_contact-sheet.png");
+                string path = Path.Combine(pathResolver.ProjectRoot, "1.7", "Preview", session.DefName + "_contact-sheet.png");
                 string exported = contactSheetExporter.Export(preview.Target, preview, ticks, path);
                 status = "Contact sheet: " + Path.GetFileName(exported);
             }
@@ -660,7 +660,7 @@ namespace LCAnimationStudio.UI
             try
             {
                 IEnumerable<int> ticks = ExportTicks();
-                string path = Path.Combine(pathResolver.ProjectRoot, "1.6", "Preview", session.DefName + "_preview.gif");
+                string path = Path.Combine(pathResolver.ProjectRoot, "1.7", "Preview", session.DefName + "_preview.gif");
                 string exported = contactSheetExporter.ExportGif(preview.Target, preview, ticks, path);
                 status = "Animated GIF: " + Path.GetFileName(exported);
             }
